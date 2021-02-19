@@ -8,6 +8,10 @@ JSON-RPC and RESTCONF options.
 For reference on the EXOS JSON-RPC, refer to [this
 document](https://documentation.extremenetworks.com/app_notes/MMI/121152_MMI_Application_Release_Notes.pdf).
 
+For reference on the EXOS OpenConfig support, refer to [this
+document](https://api.extremenetworks.com/EXOS/ProgramInterfaces/RESTCONF/RESTCONF.html
+).
+
 ### Device Configuration
 
 In order to access the EXOS device via API you must enable the web server
