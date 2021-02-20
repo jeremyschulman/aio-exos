@@ -3,12 +3,6 @@ This file contains the Extreme EXOS RESTCONF device asyncio Client.
 """
 
 # -----------------------------------------------------------------------------
-# System Imports
-# -----------------------------------------------------------------------------
-
-from typing import List, Union, Optional
-
-# -----------------------------------------------------------------------------
 # Public Imports
 # -----------------------------------------------------------------------------
 
@@ -18,7 +12,7 @@ import httpx
 # Exports
 # -----------------------------------------------------------------------------
 
-__all__ = ['Device']
+__all__ = ["Device"]
 
 
 class Device(httpx.AsyncClient):
@@ -30,16 +24,17 @@ class Device(httpx.AsyncClient):
     ----------
     https://api.extremenetworks.com/EXOS/ProgramInterfaces/RESTCONF/RESTCONF.html
     """
-    DEFAULT_PROTO = 'https'
-    URL_RESTCONF = '/rest/restconf/data/'
+
+    DEFAULT_PROTO = "https"
+    URL_RESTCONF = "/rest/restconf/data/"
 
     def __init__(self, host, username, password, proto=None, **kwargs):
-        base_url = f'{proto or self.DEFAULT_PROTO}://{host}'
-        kwargs.setdefault('verify', False)
+        base_url = f"{proto or self.DEFAULT_PROTO}://{host}"
+        kwargs.setdefault("verify", False)
 
         super().__init__(base_url=base_url, **kwargs)
 
-        self.headers['Content-Type'] = 'application/json'
+        self.headers["Content-Type"] = "application/json"
         self.__auth = dict(username=username, password=password)
 
     async def login(self):
@@ -52,7 +47,7 @@ class Device(httpx.AsyncClient):
         ------
         httpx.HTTPError if request status is not OK.
         """
-        res = await self.post('/auth/token/', json=self.__auth)
+        res = await self.post("/auth/token/", json=self.__auth)
         res.raise_for_status()
-        self.headers['X-Auth-Token'] = res.json()['token']
+        self.headers["X-Auth-Token"] = res.json()["token"]
         self.base_url = self.base_url.join(self.URL_RESTCONF)

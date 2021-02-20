@@ -18,7 +18,7 @@ import httpx
 # Exports
 # -----------------------------------------------------------------------------
 
-__all__ = ['Device']
+__all__ = ["Device"]
 
 
 # -----------------------------------------------------------------------------
@@ -27,13 +27,15 @@ __all__ = ['Device']
 #
 # -----------------------------------------------------------------------------
 
+
 class Device(httpx.AsyncClient):
     """
     The Device class implements a JSON-RPC asyncio client for Extreme EXOS.  In
     order to connect to the target device the web http or https service must be
     enabled.
     """
-    DEFAULT_PROTO = 'https'
+
+    DEFAULT_PROTO = "https"
 
     def __init__(self, host, username, password, proto=None, **kwargs):
         """
@@ -58,13 +60,13 @@ class Device(httpx.AsyncClient):
         proto: str
             OneOf ['http', 'https']
         """
-        base_url = f'{proto or self.DEFAULT_PROTO}://{host}'
+        base_url = f"{proto or self.DEFAULT_PROTO}://{host}"
 
-        kwargs.setdefault('verify', False)
-        kwargs.setdefault('auth', (username, password))
+        kwargs.setdefault("verify", False)
+        kwargs.setdefault("auth", (username, password))
 
         super().__init__(base_url=base_url, **kwargs)
-        self.headers['Content-Type'] = 'application/json'
+        self.headers["Content-Type"] = "application/json"
 
         self._req_id = 0
 
@@ -84,12 +86,14 @@ class Device(httpx.AsyncClient):
 
         return {
             "jsonrpc": "2.0",
-            "method": 'cli',
+            "method": "cli",
             "params": [commands],
-            'id': self._req_id
+            "id": self._req_id,
         }
 
-    async def cli(self, commands: Union[str, List[str]], text: Optional[bool] = False) -> List:
+    async def cli(
+        self, commands: Union[str, List[str]], text: Optional[bool] = False
+    ) -> List:
         """
         This coroutine is used to execute one or more CLI commands and return
         the results in either dict or text format.
@@ -117,24 +121,24 @@ class Device(httpx.AsyncClient):
         httpx.HTTPError when response status code is not OK.
         """
         if isinstance(commands, list):
-            commands = ';'.join(commands)
+            commands = ";".join(commands)
 
-        command_count = commands.count(';') + 1
+        command_count = commands.count(";") + 1
 
-        res = await self.post('/jsonrpc', json=self.jsonrpc(commands))
+        res = await self.post("/jsonrpc", json=self.jsonrpc(commands))
         res.raise_for_status()
-        result = res.json()['result']
+        result = res.json()["result"]
 
         # The the Caller wants the text output, then return the list of CLI
         # output items.
 
         if text is True:
             if command_count == 1:
-                return [result[0]['CLIoutput']]
+                return [result[0]["CLIoutput"]]
 
             cli_text = list()
             for cmd_i in range(command_count):
-                cli_text.append(result[cmd_i].pop(0)['CLIoutput'])
+                cli_text.append(result[cmd_i].pop(0)["CLIoutput"])
 
             return cli_text
 
@@ -153,7 +157,7 @@ class Device(httpx.AsyncClient):
         """
         This coroutine returns the configuration in text format.
         """
-        res = await self.cli('show configuration', text=True)
+        res = await self.cli("show configuration", text=True)
         return res[0]
 
     # -------------------------------------------------------------------------
@@ -169,6 +173,6 @@ class Device(httpx.AsyncClient):
         # to use the auth for parameter for re-authentication each time.
 
         if not res.is_error:
-            self.headers['Cookie'] = f"session={self.cookies['session']}"
+            self.headers["Cookie"] = f"session={self.cookies['session']}"
 
         return res
