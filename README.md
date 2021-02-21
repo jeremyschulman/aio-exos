@@ -20,3 +20,38 @@ feature using either http or https.
 ```text
 enable web https
 ```
+
+### JSON-RPC Usage
+
+```python
+from aioexos.jsonrpc import Device
+
+dev = Device(host='myhostname', username='user', password='Random')
+show_one = await dev.cli('show switch')
+show_many = await dev.cli(['show switch', 'show version'])
+
+# get text instead of JSON/dict
+
+show_text = await dev.cli('show switch', text=True)
+```
+
+### RESTCONF Usage
+
+```python
+from aioexos.restconf import Device
+
+dev = Device(host='myhostname', username='user', password='Random')
+
+# login step required for session authentication
+
+await dev.login()
+
+# execute commands providing the restconf URL, supports all request methods
+# (GET, POST, etc.)
+
+res = await dev.get('/openconfig-system:system')
+
+# close connection when done with commands
+await dev.aclose()
+```
+
