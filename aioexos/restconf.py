@@ -3,6 +3,12 @@ This file contains the Extreme EXOS RESTCONF device asyncio Client.
 """
 
 # -----------------------------------------------------------------------------
+# System Imports
+# -----------------------------------------------------------------------------
+
+from typing import Optional
+
+# -----------------------------------------------------------------------------
 # Public Imports
 # -----------------------------------------------------------------------------
 
@@ -25,6 +31,9 @@ class Device(httpx.AsyncClient):
     https://api.extremenetworks.com/EXOS/ProgramInterfaces/RESTCONF/RESTCONF.html
     """
 
+    BODY_XML = "application/yang-data+xml"
+    BODY_JSON = "application/yang-data+xml"
+
     DEFAULT_PROTO = "https"
     URL_RESTCONF = "/rest/restconf/data/"
 
@@ -35,7 +44,20 @@ class Device(httpx.AsyncClient):
         super().__init__(base_url=base_url, **kwargs)
 
         self.headers["Content-Type"] = "application/json"
+        self.body_format = self.BODY_JSON
+        self.token: Optional[str] = None
         self.__auth = dict(username=username, password=password)
+
+    @property
+    def body_format(self):
+        return self.headers["Accept"]
+
+    @body_format.setter
+    def body_format(self, content_type: str):
+        allowed = [self.BODY_JSON, self.BODY_XML]
+        if content_type not in allowed:
+            raise ValueError(f"{content_type} not one of [{allowed}]")
+        self.headers["Accept"] = content_type
 
     async def login(self):
         """
@@ -49,5 +71,7 @@ class Device(httpx.AsyncClient):
         """
         res = await self.post("/auth/token/", json=self.__auth)
         res.raise_for_status()
-        self.headers["X-Auth-Token"] = res.json()["token"]
+
+        self.token = res.json()["token"]
+        self.headers["cookie"] = f"x-auth-token={self.token}"
         self.base_url = self.base_url.join(self.URL_RESTCONF)

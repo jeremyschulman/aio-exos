@@ -15,8 +15,5 @@ async def run():
 
 
 url_system = "/openconfig-system:system"
-url_interfaces = "/openconfig-interfaces:interface"
+url_interfaces = "/openconfig-interfaces:interfaces"
 url_vlans = "/openconfig-vlan:vlans"
-
-
-asyncio.run(run())
