@@ -8,7 +8,7 @@ JSON-RPC and RESTCONF options.
 For reference on the EXOS JSON-RPC, refer to [this
 document](https://documentation.extremenetworks.com/app_notes/MMI/121152_MMI_Application_Release_Notes.pdf).
 
-For reference on the EXOS OpenConfig support, refer to [this
+For reference on the EXOS RESTCONF support, refer to [this
 document](https://api.extremenetworks.com/EXOS/ProgramInterfaces/RESTCONF/RESTCONF.html
 ).
 
@@ -18,7 +18,8 @@ In order to access the EXOS device via API you must enable the web server
 feature using either http or https.
 
 ```text
-enable web https
+enable web http
+enable web https    # requires ssl configuration as well.
 ```
 
 ### JSON-RPC Usage
@@ -36,6 +37,9 @@ show_text = await dev.cli('show switch', text=True)
 ```
 
 ### RESTCONF Usage
+
+The RESTCONF API supports only JSON body at this time.  XML is not supported
+even though the documentation states that it does.
 
 ```python
 from aioexos.restconf import Device
