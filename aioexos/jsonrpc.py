@@ -132,6 +132,13 @@ class Device(httpx.AsyncClient):
         # The the Caller wants the text output, then return the list of CLI
         # output items.
 
+        # So ... turns out that when executing the 'run script' command the
+        # results is a dict and not a list.  So make it a list to be consistent
+        # with the remaining code.
+
+        if isinstance(result, dict):
+            result = [result]
+
         if text is True:
             if command_count == 1:
                 return [result[0]["CLIoutput"]]
