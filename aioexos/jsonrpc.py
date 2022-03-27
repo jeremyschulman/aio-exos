@@ -37,7 +37,7 @@ class Device(httpx.AsyncClient):
 
     DEFAULT_PROTO = "https"
 
-    def __init__(self, host, username, password, proto=None, **kwargs):
+    def __init__(self, host, username=None, password=None, proto=None, **kwargs):
         """
         Create a new device instance.
 
@@ -63,11 +63,16 @@ class Device(httpx.AsyncClient):
         base_url = f"{proto or self.DEFAULT_PROTO}://{host}"
 
         kwargs.setdefault("verify", False)
-        kwargs.setdefault("auth", (username, password))
+
+        if username and password:
+            kwargs.setdefault("auth", (username, password))
+
+        if not kwargs.get('auth'):
+            raise RuntimeError('Missing authorization')
 
         super().__init__(base_url=base_url, **kwargs)
-        self.headers["Content-Type"] = "application/json"
 
+        self.headers["Content-Type"] = "application/json"
         self._req_id = 0
 
     def jsonrpc(self, commands: str):
